@@ -53,6 +53,10 @@ resource "aws_launch_template" "app_lt" {
   user_data = base64encode(<<-EOF
               #!/bin/bash
               yum update -y
+              yum install -y amazon-ssm-agent
+              systemctl enable amazon-ssm-agent
+              systemctl start amazon-ssm-agent
+
               yum install -y httpd
               systemctl enable httpd
               systemctl start httpd
@@ -71,9 +75,9 @@ resource "aws_launch_template" "app_lt" {
 # --- Auto Scaling Group ---
 resource "aws_autoscaling_group" "app_asg" {
   name                = "${var.name}-asg"
-  desired_capacity    = 2
-  max_size            = 4
-  min_size            = 2
+  desired_capacity    = 1
+  max_size            = 3
+  min_size            = 1
   vpc_zone_identifier = var.private_subnet_ids
   target_group_arns   = [aws_lb_target_group.app_tg.arn]
   health_check_type   = "EC2"
@@ -90,19 +94,61 @@ resource "aws_autoscaling_group" "app_asg" {
   }
 }
 
-# scaling policy
+
+# Scale Out Policy
 resource "aws_autoscaling_policy" "scale_out" {
-  name                   = "scale-out-policy"
-  scaling_adjustment     = 1
-  adjustment_type        = "ChangeInCapacity"
-  cooldown               = 300
+  name                   = "${var.name}-scale-out"
   autoscaling_group_name = aws_autoscaling_group.app_asg.name
+  adjustment_type        = "ChangeInCapacity"
+  scaling_adjustment     = 1
+  cooldown               = 60
 }
 
+# Scale In Policy
 resource "aws_autoscaling_policy" "scale_in" {
-  name                   = "scale-in-policy"
-  scaling_adjustment     = -1
-  adjustment_type        = "ChangeInCapacity"
-  cooldown               = 300
+  name                   = "${var.name}-scale-in"
   autoscaling_group_name = aws_autoscaling_group.app_asg.name
+  adjustment_type        = "ChangeInCapacity"
+  scaling_adjustment     = -1
+  cooldown               = 60
 }
+
+# CloudWatch Alarm for Scale Out
+resource "aws_cloudwatch_metric_alarm" "cpu_high" {
+  alarm_name          = "${var.name}-cpu-high"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/EC2"
+  period              = 60
+  statistic           = "Average"
+  threshold           = 70
+  alarm_description   = "Scale out if CPU > 70%"
+
+  dimensions = {
+    AutoScalingGroupName = aws_autoscaling_group.app_asg.name
+  }
+
+  alarm_actions = [aws_autoscaling_policy.scale_out.arn]
+}
+
+# CloudWatch Alarm for Scale In
+resource "aws_cloudwatch_metric_alarm" "cpu_low" {
+  alarm_name          = "${var.name}-cpu-low"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/EC2"
+  period              = 60
+  statistic           = "Average"
+  threshold           = 30
+  alarm_description   = "Scale in if CPU < 30%"
+
+  dimensions = {
+    AutoScalingGroupName = aws_autoscaling_group.app_asg.name
+  }
+
+  alarm_actions = [aws_autoscaling_policy.scale_in.arn]
+}
+
+# test the scaling policies

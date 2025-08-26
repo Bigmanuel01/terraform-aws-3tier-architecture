@@ -40,3 +40,11 @@ module "database" {
 
   tags = var.tags
 }
+
+module "monitoring" {
+  source = "../../modules/monitoring"
+
+  name        = var.name
+  asg_name    = module.compute.asg_name
+  alert_email = var.alert_email
+}

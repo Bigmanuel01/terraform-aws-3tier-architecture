@@ -1,0 +1,22 @@
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+.terraform/
+.terraform.*
+
+
+# TF plan files
+*.tfplan
+
+
+# Vars with secrets
+*.auto.tfvars
+*.auto.tfvars.json
+secret*.tfvars
+
+
+# OS/editor
+.DS_Store
+.vscode/
+.idea/

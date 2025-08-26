@@ -36,3 +36,17 @@ module "compute" {
   depends_on = [module.networking]
 }
 
+module "database" {
+  source = "../../modules/database"
+
+  vpc_id             = module.networking.vpc_id
+  private_subnet_ids = module.networking.private_subnet_ids
+  db_sg_id           = module.networking.db_sg_id
+  db_name            = var.db_name
+  db_username        = var.db_username
+  db_password        = var.db_password
+  name               = var.name
+
+  tags = var.tags
+}
+

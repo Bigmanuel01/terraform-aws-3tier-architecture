@@ -5,7 +5,7 @@ It is structured into modules for networking, compute, database, and monitoring.
 
 ## Project Structure
 
-````text
+```text
 terraform-web-platform/
 ├── environments/
 │   ├── dev/
@@ -37,6 +37,7 @@ terraform-web-platform/
 │
 ├── README.md
 └── .gitignore
+```
 
 ## What It Does
 
@@ -65,7 +66,9 @@ terraform-web-platform/
    terraform init
    terraform plan
    terraform apply
-````
+   ```
+
+```
 
 ## Stress Testing Auto Scaling
 
@@ -79,3 +82,4 @@ This will push CPU utilization above the CloudWatch threshold and trigger new in
 Sensitive variables (db_username, db_password) are kept in secret-\*.auto.tfvars, which are ignored by Git.
 
 The setup is modular, so you can extend or reuse pieces (e.g., add caching, more monitoring, etc.).
+```

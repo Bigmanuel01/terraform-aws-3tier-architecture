@@ -5,42 +5,55 @@ It is structured into modules for networking, compute, database, and monitoring.
 
 ## Project Structure
 
+````text
 terraform-web-platform/
 ├── environments/
-│ ├── dev/
-│ │ ├── main.tf
-│ │ ├── terraform.tfvars
-│ │ └── vars.tf
-│ └── prod/
-│ ├── main.tf
-│ ├── terraform.tfvars
-│ └── vars.tf
+│   ├── dev/
+│   │   ├── main.tf
+│   │   ├── terraform.tfvars
+│   │   └── vars.tf
+│   └── prod/
+│       ├── main.tf
+│       ├── terraform.tfvars
+│       └── vars.tf
 │
 ├── modules/
-│ ├── networking/
-│ ├── compute/
-│ ├── database/
-│ └── monitoring/
+│   ├── networking/
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   └── outputs.tf
+│   ├── compute/
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   └── outputs.tf
+│   ├── database/
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   └── outputs.tf
+│   └── monitoring/
+│       ├── main.tf
+│       ├── variables.tf
+│       └── outputs.tf
 │
 ├── README.md
 └── .gitignore
 
 ## What It Does
 
-- **Networking**  
+- **Networking**
   Creates a VPC with public and private subnets, internet gateway, NAT gateway, and security groups.
 
-- **Compute**  
-  Launches an Auto Scaling Group (ASG) of EC2 instances behind an Application Load Balancer (ALB).  
-  User data installs Apache (`httpd`) and serves a simple web page.  
+- **Compute**
+  Launches an Auto Scaling Group (ASG) of EC2 instances behind an Application Load Balancer (ALB).
+  User data installs Apache (`httpd`) and serves a simple web page.
   Instances scale out/in automatically based on CPU utilization.
 
-- **Database**  
-  Deploys an RDS MySQL instance in private subnets with automated backups and a parameter group.  
+- **Database**
+  Deploys an RDS MySQL instance in private subnets with automated backups and a parameter group.
   Credentials are stored in `secret-<env>.auto.tfvars` files (not committed to Git).
 
-- **Monitoring**  
-  Sets up CloudWatch alarms to monitor EC2 CPU utilization and trigger ASG scaling.  
+- **Monitoring**
+  Sets up CloudWatch alarms to monitor EC2 CPU utilization and trigger ASG scaling.
   Alarms can also send notifications through SNS.
 
 ## Usage
@@ -52,7 +65,7 @@ terraform-web-platform/
    terraform init
    terraform plan
    terraform apply
-   ```
+````
 
 ## Stress Testing Auto Scaling
 

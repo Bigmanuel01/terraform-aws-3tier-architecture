@@ -15,11 +15,13 @@ terraform-web-platform/
 │ ├── main.tf
 │ ├── terraform.tfvars
 │ └── vars.tf
+│
 ├── modules/
 │ ├── networking/
 │ ├── compute/
 │ ├── database/
-│ ├── monitoring/
+│ └── monitoring/
+│
 ├── README.md
 └── .gitignore
 
